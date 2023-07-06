@@ -1,10 +1,16 @@
-- [Data Preparation](#data-preparation)  
-    - [Download Omni3D json](#download-omni3d-json)
-    - [Download Individual Datasets](#download-individual-datasets)
-- [Data Usage](#data-usage)  
-    - [Coordinate System](#coordinate-system)
-    - [Annotation Format](#annotation-format)
-    - [Example Loading Data](#example-loading-data)
+- [Data Preparation](#data-preparation)
+	- [Download Omni3D JSON](#download-omni3d-json)
+	- [Download Individual Datasets](#download-individual-datasets)
+		- [KITTI](#kitti)
+		- [nuScenes](#nuscenes)
+		- [Objectron](#objectron)
+		- [SUN RGB-D](#sun-rgb-d)
+		- [ARKitScenes](#arkitscenes)
+		- [Hypersim](#hypersim)
+- [Data Usage](#data-usage)
+	- [Coordinate System](#coordinate-system)
+	- [Annotation Format](#annotation-format)
+	- [Example Loading Data](#example-loading-data)
 
 # Data Preparation
 
@@ -13,7 +19,7 @@ The Omni3D dataset is comprised of 6 datasets which have been pre-processed into
 1. The processed Omni3D json files
 2. RGB images from each dataset separately
 
-## Download Omni3D json
+## Download Omni3D JSON
 
 Run
 
