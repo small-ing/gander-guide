@@ -1,17 +1,20 @@
 import cv2
+import midas_processing as mp
 
 # Path: main.py
 camera = cv2.VideoCapture(0)
+depth_model = mp.MiDaS()
 
 while True:
     try:
-        succss, frame = camera.read()
+        success, frame = camera.read()
     except:
         print("There is no camera")
         break
     
     #insert any model calls here
-    #
+    # model.predict(frame)
+    frame = depth_model.predict(frame)
     #
     #
     

@@ -3,50 +3,43 @@ import urllib.request
 import cv2
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 
 url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
 #urllib.request.urlretrieve(url, filename)
 
-#model_type = "DPT_Large"     # MiDaS v3 - Large     (highest accuracy, slowest inference speed)
-#model_type = "DPT_Hybrid"   # MiDaS v3 - Hybrid    (medium accuracy, medium inference speed)
-model_type = "MiDaS_small"  # MiDaS v2.1 - Small   (lowest accuracy, highest inference speed)
+class MiDaS:
+    def __init__(self):
+        self.model_type = ["MiDaS_small", "DPT_Hybrid", "DPT_Large"]
+        self.model_index = 0
+        self.midas = torch.hub.load("intel-isl/MiDaS", self.model_type[self.model_index])
+        self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        self.midas.to(self.device)
+        self.midas.eval()
+        self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 
-midas = torch.hub.load("intel-isl/MiDaS", model_type)
+        if self.model_type[self.model_index] == "DPT_Large" or self.model_type[self.model_index] == "DPT_Hybrid":
+            self.transform = self.midas_transforms.dpt_transform
+        else:
+            self.transform = self.midas_transforms.small_transform
 
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-midas.to(device)
-midas.eval()
+    def predict(self, img):
+        start = time.time()
+        input_batch = self.transform(img).to(self.device)
 
-midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+        with torch.no_grad():
+            prediction = self.midas(input_batch)
 
-if model_type == "DPT_Large" or model_type == "DPT_Hybrid":
-    transform = midas_transforms.dpt_transform
-else:
-    transform = midas_transforms.small_transform
+            prediction = torch.nn.functional.interpolate(
+                prediction.unsqueeze(1),
+                size=img.shape[:2],
+                mode="bicubic",
+                align_corners=False,
+            ).squeeze()
 
-start = time.time()
+        output = prediction.cpu().numpy()
 
-img = cv2.imread(filename)
-img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-input_batch = transform(img).to(device)
-
-with torch.no_grad():
-    prediction = midas(input_batch)
-
-    prediction = torch.nn.functional.interpolate(
-        prediction.unsqueeze(1),
-        size=img.shape[:2],
-        mode="bicubic",
-        align_corners=False,
-    ).squeeze()
-
-output = prediction.cpu().numpy()
-print("Time elapsed: ", time.time() - start)
-
-while True:
-    cv2.imshow("Camera", img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-cv2.destroyAllWindows()
-#plt.imshow(output)
+        maximum = np.amax(output)
+        output /= maximum
+        print("Time elapsed: ", time.time() - start)
+        return output
