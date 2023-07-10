@@ -43,3 +43,5 @@ class MiDaS:
         output /= maximum
         print("Time elapsed: ", time.time() - start)
         return output
+    
+    
