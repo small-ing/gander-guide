@@ -43,3 +43,7 @@ class MiDaS:
         output /= maximum
         print("Time elapsed: ", time.time() - start)
         return output
+    
+    # seperate methods to normalize and denormalize depth maps
+    
+    # local depth map evaluation (test center third of image for depth values closer than XXXXX)
