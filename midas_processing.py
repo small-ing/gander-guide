@@ -18,13 +18,14 @@ class MiDaS:
         self.midas.eval()
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 
+        self.depth_filter = None
+        
         if self.model_type[self.model_index] == "DPT_Large" or self.model_type[self.model_index] == "DPT_Hybrid":
             self.transform = self.midas_transforms.dpt_transform
         else:
             self.transform = self.midas_transforms.small_transform
 
     def predict(self, img):
-        start = time.time()
         input_batch = self.transform(img).to(self.device)
 
         with torch.no_grad():
@@ -38,12 +39,27 @@ class MiDaS:
             ).squeeze()
 
         output = prediction.cpu().numpy()
-
-        maximum = np.amax(output)
-        output /= maximum
-        print("Time elapsed: ", time.time() - start)
+        #print("Time elapsed: ", time.time() - start)
         return output
     
     # seperate methods to normalize and denormalize depth maps
-    
+    def normalize(self, img):
+        # travis webcam is 1280x720
+        maximum = np.amax(img)
+        print(maximum)
+        img /= maximum
+        return img
+        
     # local depth map evaluation (test center third of image for depth values closer than XXXXX)
+    def filter(self, img):
+        # prioritize center of image
+        
+        pass
+    
+if __name__ == "__main__":
+    midas = MiDaS()
+    img = cv2.imread(filename)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    depth = midas.predict(img)
+    plt.imshow(depth)
+    plt.show()

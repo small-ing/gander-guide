@@ -13,8 +13,7 @@ while True:
         break
     
     #insert any model calls here
-    # model.predict(frame)
-    frame = depth_model.predict(frame)
+    frame = depth_model.normalize(depth_model.predict(frame))
     #
     #
     
