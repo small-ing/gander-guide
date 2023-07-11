@@ -18,7 +18,7 @@ class MiDaS:
         self.midas.eval()
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 
-        self.depth_filter = None
+        self.depth_filter = None # need to create it
         
         if self.model_type[self.model_index] == "DPT_Large" or self.model_type[self.model_index] == "DPT_Hybrid":
             self.transform = self.midas_transforms.dpt_transform
@@ -53,8 +53,18 @@ class MiDaS:
     # local depth map evaluation (test center third of image for depth values closer than XXXXX)
     def filter(self, img):
         # prioritize center of image
-        
+        '''        
+        priority_heatmap = img * self.depth_filter
+        if np.amax(priority_heatmap) > 0.5:
+            return True
+        return False
+        '''
         pass
+    
+        
+    def alert(self, alert_flag):
+        if alert_flag:
+            print("ALERT YOU ARE ABOUT TO STUB YOUR TOE!")
     
 if __name__ == "__main__":
     midas = MiDaS()
