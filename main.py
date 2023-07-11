@@ -19,6 +19,7 @@ while True:
     
     #insert any model calls here
     frame = depth_model.normalize(depth_model.predict(frame))
+    
     depth_model.filter(frame)
     #
     #

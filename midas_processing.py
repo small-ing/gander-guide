@@ -55,6 +55,7 @@ class MiDaS:
         # prioritize center of image
         #compress to 640 x 480
 
+        print(img.shape)
 
         # Define the shape of the array
         height = 480
