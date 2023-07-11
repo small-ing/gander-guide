@@ -80,7 +80,14 @@ class MiDaS:
         if np.amax(priority_heatmap) > 0.5:
             print(np.amax(priority_heatmap))
             print("you are going to stub your toe")
-
+            return True
+        print(np.amax(priority_heatmap))
+        print("ur fine lol")
+        return False
+    
+        
+def alert(self):
+        print("ALERT YOU ARE ABOUT TO STUB YOUR TOE!")
     
 if __name__ == "__main__":
     midas = MiDaS()
