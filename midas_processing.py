@@ -46,20 +46,40 @@ class MiDaS:
     def normalize(self, img):
         # travis webcam is 1280x720
         maximum = np.amax(img)
-        print(maximum)
+        # print(maximum)
         img /= maximum
         return img
         
     # local depth map evaluation (test center third of image for depth values closer than XXXXX)
     def filter(self, img):
         # prioritize center of image
-        '''        
-        priority_heatmap = img * self.depth_filter
+        #compress to 640 x 480
+
+
+        # Define the shape of the array
+        height = 480
+        width = 640
+
+        # Calculate the center column
+        center_column = width // 2
+
+        # Create an array of zeros with the desired shape
+        filter = np.zeros((height, width))
+
+        # Generate the values using a Gaussian distribution
+        for i in range(height):
+            for j in range(width):
+                filter[i, j] = np.exp(-0.5 * ((j - center_column) / (width / 6)) ** 2)
+        
+        priority_heatmap = img * filter
+
         if np.amax(priority_heatmap) > 0.5:
+            print(np.amax(priority_heatmap))
+            print("you are going to stub your toe")
             return True
+        print(np.amax(priority_heatmap))
+        print("ur fine lol")
         return False
-        '''
-        pass
     
         
     def alert(self, alert_flag):

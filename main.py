@@ -5,6 +5,11 @@ import midas_processing as mp
 camera = cv2.VideoCapture(0)
 depth_model = mp.MiDaS()
 
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+
+
 while True:
     try:
         success, frame = camera.read()
@@ -14,6 +19,7 @@ while True:
     
     #insert any model calls here
     frame = depth_model.normalize(depth_model.predict(frame))
+    depth_model.filter(frame)
     #
     #
     
