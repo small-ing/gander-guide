@@ -18,7 +18,7 @@ class MiDaS:
         self.midas.eval()
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 
-        self.depth_filter = None # need to create it
+        self.depth_filter = None # need to create some [720x1280] array of 0-100 values
         
         if self.model_type[self.model_index] == "DPT_Large" or self.model_type[self.model_index] == "DPT_Hybrid":
             self.transform = self.midas_transforms.dpt_transform
@@ -46,13 +46,21 @@ class MiDaS:
     def normalize(self, img):
         # travis webcam is 1280x720
         maximum = np.amax(img)
+<<<<<<< HEAD
         # print(maximum)
         img /= maximum
+=======
+        if maximum < 1200:
+            img /= 1200
+        else:
+            img /= maximum
+>>>>>>> 522ae8daa0b6c76f98c1ca04e687a25d136a7ff8
         return img
         
     # local depth map evaluation (test center third of image for depth values closer than XXXXX)
     def filter(self, img):
         # prioritize center of image
+<<<<<<< HEAD
         #compress to 640 x 480
 
         print(img.shape)
@@ -77,15 +85,19 @@ class MiDaS:
         if np.amax(priority_heatmap) > 0.5:
             print(np.amax(priority_heatmap))
             print("you are going to stub your toe")
+=======
+        '''        
+        priority_heatmap = img * self.depth_filter
+        if np.amax(priority_heatmap) > ####:
+>>>>>>> 522ae8daa0b6c76f98c1ca04e687a25d136a7ff8
             return True
         print(np.amax(priority_heatmap))
         print("ur fine lol")
         return False
     
         
-    def alert(self, alert_flag):
-        if alert_flag:
-            print("ALERT YOU ARE ABOUT TO STUB YOUR TOE!")
+    def alert(self):
+        print("ALERT YOU ARE ABOUT TO STUB YOUR TOE!")
     
 if __name__ == "__main__":
     midas = MiDaS()
