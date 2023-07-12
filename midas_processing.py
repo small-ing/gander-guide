@@ -22,7 +22,7 @@ class MiDaS:
         self.depth_filter = np.zeros((self.height, self.width)) # need to create some [720x1280] array of 0-100 values
         for i in range(self.height):
             for j in range(self.width):
-                self.depth_filter[i, j] = np.exp(-0.5 * ((j - (self.width//2))) / (self.width / 6)) ** 2
+                self.depth_filter[i, j] = np.exp( -0.5 * (((j - (self.width//2))) / (self.width / 6)) ** 2)
         
         if self.model_type[self.model_index] == "DPT_Large" or self.model_type[self.model_index] == "DPT_Hybrid":
             self.transform = self.midas_transforms.dpt_transform
@@ -59,19 +59,9 @@ class MiDaS:
         
     # local depth map evaluation (test center third of image for depth values closer than XXXXX)
     def filter(self, img):
-        # prioritize center of image
-        #compress to 640 x 480
-
-        # Define the shape of the array
-       
-        # Calculate the center column
-
-        # Create an array of zeros with the desired shape
-        # Generate the values using a Gaussian distribution
-        
         priority_heatmap = img * self.depth_filter
-
-        if np.amax(priority_heatmap) > 0.5:
+        #return priority_heatmap
+        if np.amax(priority_heatmap) > 0.6:
             print(np.amax(priority_heatmap))
             print("you are going to stub your toe")
             return True
@@ -79,14 +69,13 @@ class MiDaS:
         print("ur fine lol")
         return False
     
-        
-def alert(self):
-        print("ALERT YOU ARE ABOUT TO STUB YOUR TOE!")
     
 if __name__ == "__main__":
     midas = MiDaS()
     img = cv2.imread(filename)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, (640, 480))
     depth = midas.predict(img)
+    depth = midas.filter(depth)
     plt.imshow(depth)
     plt.show()
