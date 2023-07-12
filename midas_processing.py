@@ -5,14 +5,11 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
-height = 480
-width = 640
-
 url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
 #urllib.request.urlretrieve(url, filename)
 
 class MiDaS:
-    def __init__(self):
+    def __init__(self, height=480, width=640):
         self.model_type = ["MiDaS_small", "DPT_Hybrid", "DPT_Large"]
         self.model_index = 0
         self.midas = torch.hub.load("intel-isl/MiDaS", self.model_type[self.model_index])
@@ -21,7 +18,11 @@ class MiDaS:
         self.midas.eval()
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 
-        self.depth_filter = None # need to create some [720x1280] array of 0-100 values
+        self.height, self.width = height, width
+        self.depth_filter = np.zeros((self.height, self.width)) # need to create some [720x1280] array of 0-100 values
+        for i in range(self.height):
+            for j in range(self.width):
+                self.depth_filter[i, j] = np.exp(-0.5 * ((j - (self.width//2))) / (self.width / 6)) ** 2
         
         if self.model_type[self.model_index] == "DPT_Large" or self.model_type[self.model_index] == "DPT_Hybrid":
             self.transform = self.midas_transforms.dpt_transform
@@ -61,22 +62,14 @@ class MiDaS:
         # prioritize center of image
         #compress to 640 x 480
 
-        print(img.shape)
-
         # Define the shape of the array
        
         # Calculate the center column
-        center_column = width // 2
 
         # Create an array of zeros with the desired shape
-        filter = np.zeros((height, width))
-
         # Generate the values using a Gaussian distribution
-        for i in range(height):
-            for j in range(width):
-                filter[i, j] = np.exp(-0.5 * ((j - center_column) / (width / 6)) ** 2)
         
-        priority_heatmap = img * filter
+        priority_heatmap = img * self.depth_filter
 
         if np.amax(priority_heatmap) > 0.5:
             print(np.amax(priority_heatmap))
