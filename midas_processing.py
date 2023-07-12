@@ -5,6 +5,9 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
+height = 480
+width = 640
+
 url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
 #urllib.request.urlretrieve(url, filename)
 
@@ -61,9 +64,7 @@ class MiDaS:
         print(img.shape)
 
         # Define the shape of the array
-        height = 480
-        width = 640
-
+       
         # Calculate the center column
         center_column = width // 2
 
