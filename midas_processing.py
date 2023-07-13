@@ -67,8 +67,7 @@ class MiDaS:
             return True
         # print("ur fine lol")
         return False
-    
-    
+
 if __name__ == "__main__":
     midas = MiDaS()
     img = cv2.imread(filename)
