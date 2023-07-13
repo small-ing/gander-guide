@@ -63,10 +63,19 @@ class MiDaS:
         priority_heatmap = scale_image * self.depth_filter
         #return priority_heatmap
         if np.amax(priority_heatmap) > 0.6:
-            # print("you are going to stub your toe")
-            return True
+            third = scale_image.shape[1] // 3
+            print("width was ", (third*3))
+            left = np.mean(scale_image[:, :third])
+            right = np.mean(scale_image[:, 2 * third:])
+        
+            if right - left > 0.25:
+                return "go left"
+            elif left - right > 0.25:
+                return "go right"
+            else:
+                return "object ahead"
         # print("ur fine lol")
-        return False
+        return "no problem"
     
     
 if __name__ == "__main__":
