@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, Res
 import json
 import cv2
 import os
+import numpy as np
 import midas_processing as mp
 
 def get_base_url(port:int) -> str:
@@ -107,9 +108,8 @@ def gen_frames():
         
         
         image = tracker.normalize(tracker.predict(image), 255)
-        if tracker.filter(image, 255):
-            cv2.putText(image, "WARNING: BONK DETECTED", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-    
+        cv2.putText(image, tracker.filter(image, 255), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            
         try:
             ret, buffer = cv2.imencode('.jpg', image)
             frame = buffer.tobytes()
