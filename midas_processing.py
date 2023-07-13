@@ -47,7 +47,7 @@ class MiDaS:
         return output
     
     # seperate methods to normalize and denormalize depth maps
-    def normalize(self, img):
+    def normalize(self, img, scale_factor=1):
         # travis webcam is 1280x720
         maximum = np.amax(img)
 
@@ -55,18 +55,17 @@ class MiDaS:
             img /= 1200
         else:
             img /= maximum
-        return img
+        return img * scale_factor
         
     # local depth map evaluation (test center third of image for depth values closer than XXXXX)
-    def filter(self, img):
-        priority_heatmap = img * self.depth_filter
+    def filter(self, img, scale_factor=1):
+        scale_image = img / scale_factor
+        priority_heatmap = scale_image * self.depth_filter
         #return priority_heatmap
         if np.amax(priority_heatmap) > 0.6:
-            print(np.amax(priority_heatmap))
-            print("you are going to stub your toe")
+            # print("you are going to stub your toe")
             return True
-        print(np.amax(priority_heatmap))
-        print("ur fine lol")
+        # print("ur fine lol")
         return False
     
     
