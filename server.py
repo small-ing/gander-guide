@@ -4,6 +4,7 @@ import cv2
 import os
 import numpy as np
 import midas_processing as mp
+import base64
 
 def get_base_url(port:int) -> str:
     '''
@@ -112,6 +113,10 @@ def gen_frames():
             
         try:
             ret, buffer = cv2.imencode('.jpg', image)
+            img_64 = base64.b64encode(buffer)
+            #print(img_64)
+            #pred = tracker.identifier.predict(img_64)
+            #print(pred)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

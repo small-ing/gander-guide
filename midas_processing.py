@@ -4,6 +4,7 @@ import cv2
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+import furniture_detection as fd
 
 url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
 #urllib.request.urlretrieve(url, filename)
@@ -28,10 +29,11 @@ class MiDaS:
             self.transform = self.midas_transforms.dpt_transform
         else:
             self.transform = self.midas_transforms.small_transform
+        
+        self.identifier = fd.FurnitureIdentifier()
 
     def predict(self, img):
         input_batch = self.transform(img).to(self.device)
-
         with torch.no_grad():
             prediction = self.midas(input_batch)
 
@@ -64,7 +66,6 @@ class MiDaS:
         #return priority_heatmap
         if np.amax(priority_heatmap) > 0.6:
             third = scale_image.shape[1] // 3
-            print("width was ", (third*3))
             left = np.mean(scale_image[:, :third])
             right = np.mean(scale_image[:, 2 * third:])
         
