@@ -19,6 +19,12 @@ class MiDaS:
         self.midas.eval()
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 
+        self.FOV = 70.42 # deg
+        self.min_angle_for_prompt = 10 # deg
+        self.min_danger_for_problem = 230 # arbitrary
+
+        self.bestXs = [0, 0] # init a queue
+
         self.height, self.width = height, width
         self.depth_filter = np.zeros((self.height, self.width)) # need to create some [720x1280] array of 0-100 values
         for i in range(self.height):
@@ -53,30 +59,49 @@ class MiDaS:
         # travis webcam is 1280x720
         maximum = np.amax(img)
 
-        if maximum < 1200:
-            img /= 1200
-        else:
-            img /= maximum
+        img /= maximum
         return img * scale_factor
         
     # local depth map evaluation (test center third of image for depth values closer than XXXXX)
     def filter(self, img, scale_factor=1):
-        scale_image = img / scale_factor
-        priority_heatmap = scale_image * self.depth_filter
-        #return priority_heatmap
-        if np.amax(priority_heatmap) > 0.6:
-            third = scale_image.shape[1] // 3
-            left = np.mean(scale_image[:, :third])
-            right = np.mean(scale_image[:, 2 * third:])
+        output = img / scale_factor
         
-            if right - left > 0.25:
-                return "go left"
-            elif left - right > 0.25:
-                return "go right"
+        ## START OF NEW STUFF
+
+        # Calculate the column-wise sums
+        column_sums = np.sum(output * self.depth_filter, axis=0)
+        
+        # Minimum 'danger level' to call it a problem
+        if max(column_sums) < self.min_danger_for_problem:
+            # blur horizontally to mitigate noise
+            blurred = cv2.blur(output, (10, 1))
+            
+            # Find the most free path with the minimum weighted average value 
+            weights = np.linspace(1, 7, self.height).reshape((self.height, 1))
+            candidate = np.argmin(np.mean(blurred * weights, axis=0))
+            
+            # average from a queue of length 3 with lower rows weighted higher
+            self.bestXs.append(candidate)
+            bestX = round(sum(self.bestXs)/3)
+            self.bestXs.pop(0)
+            
+            # annotate with a line
+            output = cv2.line(output, (bestX, 0), (self.bestX, self.height), (255, 20, 100), 3)
+            
+            # find the angle to correct path and notify 
+            angle = int(self.FOV * self.bestX / self.height - self.FOV / 2)
+            
+            if angle < -self.min_angle_for_prompt:
+                return "Turn left by {-angle} degrees"
+            elif angle > self.min_angle_for_prompt:
+                return "Turn right by {angle} degrees"
+        else:
+            angle = int(self.FOV * np.argmax(column_sums) / self.height - self.FOV / 2)
+            if angle < 0:
+                return "Problem({round(max(column_sums))}) on left by {-angle} degrees"
             else:
-                return "object ahead"
-        # print("ur fine lol")
-        return "no problem"
+                return "Problem({round(max(column_sums))}) on right by {angle} degrees"
+        ## END OF NEW STUFF
     
     
 if __name__ == "__main__":
