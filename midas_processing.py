@@ -68,7 +68,7 @@ class MiDaS:
 
         # Calculate the column-wise sums
         column_sums = np.sum(output * self.depth_filter, axis=0)
-        
+        str = " "
         # Minimum 'danger level' to call it a problem
         if max(column_sums) < self.min_danger_for_problem:
             # blur horizontally to mitigate noise
@@ -87,14 +87,15 @@ class MiDaS:
             output = cv2.line(output, (bestX, 0), (bestX, self.height), (255, 20, 100), 3)
             
             # find the angle to correct path and notify 
-            angle = int(self.FOV * bestX / self.height - self.FOV / 2)
-            
+            angle = int(self.FOV * bestX / self.width - self.FOV / 2)
+        
             if angle < -self.min_angle_for_prompt:
                 str = f"Turn left by {-angle} degrees"
             elif angle > self.min_angle_for_prompt:
                 str = f"Turn right by {angle} degrees"
         else:
-            angle = int(self.FOV * np.argmax(column_sums) / self.height - self.FOV / 2)
+            angle = int(self.FOV * np.argmax(column_sums) / self.width - self.FOV / 2)
+
             if angle < 0:
                 str = f"Problem({round(max(column_sums))}) on left by {-angle} degrees"
             else:
