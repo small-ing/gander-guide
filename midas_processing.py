@@ -90,15 +90,16 @@ class MiDaS:
             angle = int(self.FOV * self.bestX / self.height - self.FOV / 2)
             
             if angle < -self.min_angle_for_prompt:
-                return "Turn left by {-angle} degrees"
+                str = f"Turn left by {-angle} degrees"
             elif angle > self.min_angle_for_prompt:
-                return "Turn right by {angle} degrees"
+                str = f"Turn right by {angle} degrees"
         else:
             angle = int(self.FOV * np.argmax(column_sums) / self.height - self.FOV / 2)
             if angle < 0:
-                return "Problem({round(max(column_sums))}) on left by {-angle} degrees"
+                str = f"Problem({round(max(column_sums))}) on left by {-angle} degrees"
             else:
-                return "Problem({round(max(column_sums))}) on right by {angle} degrees"
+                str = f"Problem({round(max(column_sums))}) on right by {angle} degrees"
+        return str
         ## END OF NEW STUFF
     
     
