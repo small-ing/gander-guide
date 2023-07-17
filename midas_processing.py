@@ -84,7 +84,7 @@ class MiDaS:
             self.bestXs.pop(0)
             
             # annotate with a line
-            output = cv2.line(output, (bestX, 0), (self.bestX, self.height), (255, 20, 100), 3)
+            output = cv2.line(output, (bestX, 0), (bestX, self.height), (255, 20, 100), 3)
             
             # find the angle to correct path and notify 
             angle = int(self.FOV * self.bestX / self.height - self.FOV / 2)
