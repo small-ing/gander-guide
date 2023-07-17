@@ -1,5 +1,6 @@
 import cv2
 import midas_processing as mp
+import base64
 
 # Path: main.py
 camera = cv2.VideoCapture(0)

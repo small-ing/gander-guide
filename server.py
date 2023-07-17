@@ -4,6 +4,7 @@ import cv2
 import os
 import numpy as np
 import midas_processing as mp
+import base64
 
 def get_base_url(port:int) -> str:
     '''
@@ -52,7 +53,27 @@ tracker = mp.MiDaS()
 @app.route(f"{base_url}")
 def index():
     print("Loading Home Page...")
-    return render_template("main.html")
+    global switch, cap, wireframe
+    if request.method == 'POST':
+        if request.form.get('stop') == 'Start or Stop Video':
+            print("Flipping switch")
+            if(switch==1):
+                switch=0
+                cap.release()
+                cv2.destroyAllWindows()
+            else:
+                cap = cv2.VideoCapture(0)
+                switch=1
+        if request.form.get('wire') == 'Toggle Wireframe':
+            print("Flipping wireframe")
+            if(wireframe==True):
+                wireframe=False
+            else:
+                wireframe=True
+    
+    elif request.method == 'GET':
+        return render_template("index.html")
+    return render_template("index.html")
 
 # Introduction Video + How to Use
 @app.route(f"{base_url}/intro/")
@@ -112,6 +133,10 @@ def gen_frames():
             
         try:
             ret, buffer = cv2.imencode('.jpg', image)
+            img_64 = base64.b64encode(buffer)
+            #print(img_64)
+            #pred = tracker.identifier.predict(img_64)
+            #print(pred)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

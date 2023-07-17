@@ -4,6 +4,7 @@ import cv2
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+import furniture_detection as fd
 
 url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
 #urllib.request.urlretrieve(url, filename)
@@ -34,10 +35,11 @@ class MiDaS:
             self.transform = self.midas_transforms.dpt_transform
         else:
             self.transform = self.midas_transforms.small_transform
+        
+        self.identifier = fd.FurnitureIdentifier()
 
     def predict(self, img):
         input_batch = self.transform(img).to(self.device)
-
         with torch.no_grad():
             prediction = self.midas(input_batch)
 
@@ -65,7 +67,7 @@ class MiDaS:
         output = img / scale_factor
         
         ## START OF NEW STUFF
-
+        str = 'everything is fine'
         # Calculate the column-wise sums
         column_sums = np.sum(output * self.depth_filter, axis=0)
         str = " "
