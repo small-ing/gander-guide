@@ -67,7 +67,7 @@ class MiDaS:
         output = img / scale_factor
         
         ## START OF NEW STUFF
-
+        str = 'everything is fine'
         # Calculate the column-wise sums
         column_sums = np.sum(output * self.depth_filter, axis=0)
         
@@ -89,7 +89,7 @@ class MiDaS:
             output = cv2.line(output, (bestX, 0), (bestX, self.height), (255, 20, 100), 3)
             
             # find the angle to correct path and notify 
-            angle = int(self.FOV * self.bestX / self.height - self.FOV / 2)
+            angle = int(self.FOV * bestX / self.height - self.FOV / 2)
             
             if angle < -self.min_angle_for_prompt:
                 str = f"Turn left by {-angle} degrees"
